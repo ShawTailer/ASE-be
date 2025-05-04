@@ -20,7 +20,10 @@ export const signup = async (req, res) => {
     const user = await User.create({ username, name, email, password: hashed });
     const token = jwt.sign({ userId: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.status(201).json({ token });
+    return res.status(201).json({
+      message: 'Register successful',
+      token
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
@@ -40,7 +43,10 @@ export const login = async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ userId: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+    return res.status(200).json({
+      message: 'Login successful',
+      token
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
