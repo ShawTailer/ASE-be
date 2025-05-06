@@ -17,6 +17,9 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    role: {
+      type: DataTypes.ENUM('teacher', 'student', 'guest')
+    }
   }, {
     tableName: 'users',
     timestamps: true,

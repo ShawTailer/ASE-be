@@ -1,5 +1,5 @@
 export default (sequelize, DataTypes) => {
-    return sequelize.define('Buildings', {
+    const buildings = sequelize.define('Buildings', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true
@@ -15,5 +15,14 @@ export default (sequelize, DataTypes) => {
         }
     }, {
         tableName: 'buildings',
+        timestamps: false
     });
+
+    buildings.associate = models => {
+        buildings.hasMany(models.rooms, {
+            foreignKey: 'building_id',
+            as: 'rooms'
+        });
+    };
+    return buildings;
 };

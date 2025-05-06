@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import db from './models/index.js';
 import authRoutes from './routes/auth.js';
+import bookRoutes from './routes/book.js';
 
 dotenv.config();
 const app = express();
@@ -20,6 +21,8 @@ try {
 app.use(express.json());
 // Auth routes
 app.use('/api/auth', authRoutes);
+// Book routes
+app.use('/api/booking', bookRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
