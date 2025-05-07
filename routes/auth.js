@@ -1,16 +1,19 @@
-import express from 'express';
-import { body } from 'express-validator';
-import { signup, login } from '../controllers/authController.js';
+const express = require('express');
+const { body } = require('express-validator');
+const { signup, login } = require('../controllers/authController.js');
 
 const router = express.Router();
 
 router.post(
   '/signup',
   [
-    body('username').notEmpty(),
-    body('name').notEmpty(),
+    body('username').notEmpty().isLength({ min: 3, max: 50 }),
+    body('first_name').notEmpty(),
+    body('last_name').notEmpty(),
     body('email').isEmail(),
-    body('password').isLength({ min: 6 }),
+    body('phone_num').notEmpty().isMobilePhone(),
+    body('hashed_password').isLength({ min: 6 }).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/),
+    body('role').isIn(['teacher', 'student', 'guest'])
   ],
   signup
 );
@@ -19,9 +22,9 @@ router.post(
   '/login',
   [
     body('username').notEmpty(),
-    body('password').exists(),
+    body('password').exists()
   ],
   login
 );
 
-export default router;
+module.exports = router;

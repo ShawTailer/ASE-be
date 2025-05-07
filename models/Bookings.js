@@ -1,48 +1,47 @@
-import { model } from "mongoose";
-
-export default (sequelize, DataTypes) => {
-    const book = sequelize.define('Bookings', {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true
-        },
-        room_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            unique: true
-        },
-        user: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        status: {
-            type: DataTypes.ENUM('cancelled', 'pending', 'confirmed'),
-            allowNull: false
-        },
-        start_time: {
-            type: DataTypes.DATE,
-            allowNull: false
-        },
-        end_time: {
-            type: DataTypes.DATE,
-            allowNull: false
-        },
+module.exports = (sequelize, DataTypes) => {
+    const Booking = sequelize.define('Booking', {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+      room_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      user: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      status: {
+        type: DataTypes.ENUM('cancelled', 'pending', 'confirmed'),
+        allowNull: false
+      },
+      start_time: {
+        type: DataTypes.DATE,
+        allowNull: false
+      },
+      end_time: {
+        type: DataTypes.DATE,
+        allowNull: false
+      }
     }, {
-        tableName: 'bookings',
-        timestamps: true,
-        created_at: 'created_at',
-        updated_at: 'booking_changed_at',
+      tableName: 'bookings',
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at'
     });
-
-    book.associate = models => {
-        book.belongsTo(models.Rooms, {
-            foreignKey: 'room_id',
-        });
-
-        book.belongsTo(models.User, {
-            foreignKey: 'user',
-        });
+  
+    Booking.associate = models => {
+      Booking.belongsTo(models.Room, {
+        foreignKey: 'room_id',
+        as: 'room'
+      });
+      Booking.belongsTo(models.User, {
+        foreignKey: 'user',
+        as: 'bookedBy' // Changed from 'user' to 'bookedBy'
+      });
     };
-
-    return book
-};
+  
+    return Booking;
+  };

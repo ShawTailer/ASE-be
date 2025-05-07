@@ -1,28 +1,30 @@
-export default (sequelize, DataTypes) => {
-    const buildings = sequelize.define('Buildings', {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true
-        },
-        name: {
-            type: DataTypes.STRING,
-        },
-        description: {
-            type: DataTypes.STRING,
-        },
-        location: {
-            type: DataTypes.STRING,
-        }
+module.exports = (sequelize, DataTypes) => {
+    const Building = sequelize.define('Building', {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+      name: {
+        type: DataTypes.STRING
+      },
+      description: {
+        type: DataTypes.STRING
+      },
+      location: {
+        type: DataTypes.STRING
+      }
     }, {
-        tableName: 'buildings',
-        timestamps: false
+      tableName: 'buildings',
+      timestamps: false
     });
-
-    buildings.associate = models => {
-        buildings.hasMany(models.rooms, {
-            foreignKey: 'building_id',
-            as: 'rooms'
-        });
+  
+    Building.associate = models => {
+      Building.hasMany(models.Room, {
+        foreignKey: 'building_id',
+        as: 'rooms'
+      });
     };
-    return buildings;
-};
+  
+    return Building;
+  };

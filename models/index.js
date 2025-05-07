@@ -1,22 +1,15 @@
-import { Sequelize, DataTypes } from 'sequelize';
-import dbConfig from '../config/db.js';
-import UserModel from './User.js';
-import RoomModel from './Rooms.js';
-import BuildingModel from './Buildings.js';
-import BookingModel from './Bookings.js';
-import { models } from 'mongoose';
+const { Sequelize, DataTypes } = require('sequelize');
+const dbConfig = require('../config/db.js');
+const UserModel = require('./User.js');
+const RoomModel = require('./Rooms.js');
+const BuildingModel = require('./Buildings.js');
+const BookingModel = require('./Bookings.js');
 
-const sequelize = new Sequelize(
-  dbConfig.DB,
-  dbConfig.USER,
-  dbConfig.PASSWORD,
-  {
-    host: dbConfig.HOST,
-    dialect: dbConfig.dialect,
-    pool: dbConfig.pool,
-    logging: false
-  }
-);
+const sequelize = new Sequelize(dbConfig.DATABASE_URL, {
+  dialect: dbConfig.dialect,
+  pool: dbConfig.pool,
+  logging: false
+});
 
 const db = {};
 
@@ -33,4 +26,4 @@ Object.values(db).forEach(model => {
   }
 });
 
-export default db;
+module.exports = db;
