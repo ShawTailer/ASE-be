@@ -19,5 +19,8 @@ $db.sequelize = sequelize;
 
 // User model
 db.User = require('./User.js')(sequelize, DataTypes);
-
+// Room model
+db.Room = require('./Rooms.js')(sequelize, DataTypes);
+// Building model
+db.Building = require('./Buildings.js')(sequelize, DataTypes);
 module.exports = db;
