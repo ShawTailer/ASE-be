@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { bookRoom, checkBooking, displayRooms } from '../controllers/bookController.js';
+import { bookRoom, checkBooking, displayRooms, changeBookStatus } from '../controllers/bookController.js';
 
 const router = express.Router();
 
@@ -30,6 +30,16 @@ router.get('/getRooms',
         query('date').optional().isISO8601()
     ],
     displayRooms
+);
+
+router.put(
+  '/booking/status',
+  [
+    body('booking_id').notEmpty().isInt(),
+    body('new_status').notEmpty(),
+    body('username').notEmpty()
+  ],
+  changeBookStatus
 );
 
 export default router;

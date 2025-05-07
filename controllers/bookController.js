@@ -126,3 +126,44 @@ export const displayRooms = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+export const changeBookStatus = async(req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors) return res.status(400).json({ error: errors.array() });
+
+        const { booking_id, new_status, username } = req.body;
+
+        // Validate new status
+        if (!['confirmed', 'cancelled'].includes(new_status)) {
+            return res.status(400).json({ error: 'Invalid booking status' });
+        }
+
+        // Find booking
+        const booking = await db.Booking.findByPk(booking_id);
+        if (!booking) return res.status(404).json({ error: 'Booking not found' });
+
+        // Check if the booking belongs to the user
+        if (booking.user !== username) {
+            return res.status(403).json({ error: 'You can only change your own bookings' });
+        }
+
+        // Update booking status
+        booking.status = new_status;
+        await booking.save();
+
+        // Fetch additional info for notification
+        const room = await db.Room.findByPk(booking.room_id);
+        const user = await db.User.findByPk(username);
+
+        // Simulate sending notification (replace with actual email/SMS logic)
+        console.log(`Notification to ${user.email || user.phone_num}:`);
+        console.log(`Your booking for Room ${room.room_number} has been ${new_status}.`);
+        console.log(`Time: ${booking.start_time} to ${booking.end_time}`);
+
+        return res.status(200).json({ message: 'Booking status updated', booking });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
