@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const db = require('./models/index.js');
 const authRoutes = require('./routes/auth.js');
 const bookRoutes = require('./routes/book.js');
+const cors = require('cors');
 
 dotenv.config();
 const app = express();
@@ -20,6 +21,11 @@ const app = express();
 })();
 
 // Middleware
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow your frontend origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+}));
 app.use(express.json());
 // Auth routes
 app.use('/api/auth', authRoutes);

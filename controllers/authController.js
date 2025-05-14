@@ -18,11 +18,23 @@ exports.signup = async (req, res) => {
     const hashed = await bcrypt.hash(hashed_password, salt);
 
     const user = await User.create({ username, first_name, last_name, email, phone_num, hashed_password: hashed, role });
-    const token = jwt.sign({ userId: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(
+      { userId: user.username, username: user.username, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
     return res.status(201).json({
       message: 'Register successful',
-      token
+      token,
+      user: {
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        phone_num: user.phone_num,
+        role: user.role
+      }
     });
   } catch (err) {
     console.error(err);
@@ -42,10 +54,23 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.hashed_password);
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ userId: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(
+      { userId: user.username, username: user.username, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
     return res.status(200).json({
       message: 'Login successful',
-      token
+      token,
+      user: {
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        phone_num: user.phone_num,
+        role: user.role
+      }
     });
   } catch (err) {
     console.error(err);
