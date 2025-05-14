@@ -1,6 +1,6 @@
 const express = require('express');
 const { body, query } = require('express-validator');
-const { bookRoom, checkBooking, displayRooms, changeBookStatus } = require('../controllers/bookController.js');
+const { bookRoom, checkBooking, displayRooms, changeBookStatus, getRoomBookings } = require('../controllers/bookController.js');
 
 const router = express.Router();
 
@@ -41,6 +41,15 @@ router.put(
     body('username').notEmpty()
   ],
   changeBookStatus
+);
+
+router.get(
+  '/roomBookings',
+  [
+    query('room_id').notEmpty().isInt(),
+    query('date').notEmpty().isISO8601()
+  ],
+  getRoomBookings
 );
 
 module.exports = router;

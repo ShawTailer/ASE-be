@@ -159,3 +159,82 @@ exports.changeBookStatus = async (req, res) => {
     return res.status(500).json({ error: err.message || 'Internal server error' });
   }
 };
+
+exports.getRoomBookings = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ error: errors.array() });
+
+    const { room_id, date } = req.query;
+
+    const room = await db.Room.findByPk(room_id);
+    if (!room) return res.status(404).json({ error: 'Room not found' });
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const bookings = await db.Booking.findAll({
+      where: {
+        room_id,
+        start_time: { [Op.lt]: endOfDay },
+        end_time: { [Op.gt]: startOfDay }
+      },
+      include: [
+        {
+          model: db.User,
+          as: 'bookedBy',
+          attributes: ['username', 'first_name', 'last_name']
+        }
+      ],
+      attributes: ['id', 'room_id', 'user', 'start_time', 'end_time', 'status']
+    });
+
+    const mappedBookings = bookings.map(booking => {
+      const startDate = new Date(booking.start_time);
+      const endDate = new Date(booking.end_time);
+
+      const startHour = startDate.getUTCHours() + startDate.getUTCMinutes() / 60;
+      const endHour = endDate.getUTCHours() + endDate.getUTCMinutes() / 60;
+
+      if (startHour < 5 || startHour > 23) {
+        throw new Error(`Start time ${booking.start_time} is outside valid range (5:00–23:00)`);
+      }
+      if (endHour < 5 || endHour > 23) {
+        throw new Error(`End time ${booking.end_time} is outside valid range (5:00–23:00)`);
+      }
+
+      const mappedStart = startHour - 5;
+      const mappedEnd = endHour - 5;
+
+      const user = booking.bookedBy;
+      const full_name = `${user.first_name} ${user.last_name}`;
+
+      return {
+        booking_id: booking.id,
+        room_id: booking.room_id,
+        username: booking.user,
+        full_name,
+        start_time: booking.start_time,
+        end_time: booking.end_time,
+        mapped_start_time: mappedStart,
+        mapped_end_time: mappedEnd,
+        status: booking.status
+      };
+    });
+
+    return res.status(200).json({
+      message: 'Bookings retrieved successfully',
+      room: {
+        room_id: room.room_id,
+        room_number: room.room_number
+      },
+      bookings: mappedBookings
+    });
+  } catch (err) {
+    console.error('Error in getRoomBookings:', err);
+    return res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+};
